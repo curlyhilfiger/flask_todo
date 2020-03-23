@@ -6,7 +6,7 @@ class Config(object):
     DEBUG = False
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = "You db here"
+    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:12345@localhost/todo"
 
     SESSION_COOKIE_SECURE = True
 
@@ -22,3 +22,5 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     pass
 
+
+key = Config.SECRET_KEY

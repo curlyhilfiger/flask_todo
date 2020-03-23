@@ -2,10 +2,10 @@ from app.models import Todo
 from app import db
 
 
-def get_todos():
+def get_todos(user):
     """ Get all todos """
 
-    todos = Todo.query.all()
+    todos = Todo.query.filter_by(user_id=user.id)
 
     output = []
 
@@ -14,6 +14,7 @@ def get_todos():
         todo_data["id"] = todo.id
         todo_data["text"] = todo.text
         todo_data["complete"] = todo.complete
+        todo_data["user_id"] = todo.user_id
 
         if todo.complete == True:
             output.append(todo_data)
@@ -23,10 +24,10 @@ def get_todos():
     return output
 
 
-def get_todo(todo_id):
+def get_todo(user, todo_id):
     """ Get one todo """
 
-    todo = Todo.query.filter_by(id=todo_id).first()
+    todo = Todo.query.filter_by(id=todo_id, user_id=user.id).first()
 
     todo_data = {}
     todo_data["id"] = todo.id
@@ -36,36 +37,36 @@ def get_todo(todo_id):
     return todo_data
 
 
-def edit_todo(todo_id, text):
+def edit_todo(user, todo_id, text):
     """ Edit todo text """
 
-    todo = Todo.query.filter_by(id=todo_id).first()
+    todo = Todo.query.filter_by(id=todo_id, user_id=user.id).first()
 
     todo.text = text
     db.session.commit()    
 
 
-def delete_todo(todo_id):
+def delete_todo(user, todo_id):
     """ Removes todo """
 
-    todo = Todo.query.filter_by(id=todo_id).first()
+    todo = Todo.query.filter_by(id=todo_id, user_id=user.id).first()
 
     db.session.delete(todo)
     db.session.commit()
 
 
-def create_todo(text):
+def create_todo(user, text):
     """ Create todo  """
 
-    todo = Todo(text=text)
+    todo = Todo(text=text, user=user)
     db.session.add(todo)
     db.session.commit()
 
 
-def complete_todo(todo_id):
+def complete_todo(user, todo_id):
     """ Makes todo complete """
 
-    todo = Todo.query.filter_by(id=todo_id).first()
+    todo = Todo.query.filter_by(id=todo_id, user_id=user.id).first()
 
     todo.complete = not todo.complete
     db.session.commit()
