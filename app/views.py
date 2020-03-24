@@ -40,33 +40,25 @@ def create_user():
 @token_required
 def todos(current_user):
 
-    todos = todo_service.get_todos(current_user)
-    if len(todos) == 0:
-        return  {}, 204
-
-    return {"todos": todos}
+    response = todo_service.get_todos(current_user)
+    return response
+   
 
 @app.route("/todo/<id>", methods=["GET"])
 @token_required
 def todo(current_user, id):
 
-    try:
-        todo = todo_service.get_todo(current_user, id)
-    except  AttributeError as e:
-        return {"error": str(e)}, 404
-    
-    return {"todo": todo}
+    response = todo_service.get_todo(current_user, id)
+    return response
+
 
 @app.route("/todo/<id>", methods=["DELETE"])
 @token_required
 def delete(current_user, id):
 
-    try:
-        todo_service.delete_todo(current_user, id)
-    except  AttributeError as e:
-        return {"error": str(e)}, 404
+    response = todo_service.delete_todo(current_user, id)
+    return response
 
-    return {"msg": "Todo was deleted"}
 
 @app.route("/edit/<id>", methods=["PUT"])
 @token_required
@@ -74,16 +66,19 @@ def edit(current_user, id):
 
     if request.is_json:
         data = request.get_json()
-        if id == "null":
-            return {"error": "No id"}, 422
-        print(data["text"])
         if "text" in data:
-            todo_service.edit_todo(current_user, id, data["text"])
-            return {"msg": "Todo was success edited"}
-            
-        return {"msg": "No text atr"}, 404
+            response = todo_service.edit_todo(current_user, id, data["text"])
+            return response
+
+        response_object = {
+            "status": "fail",
+            "message": "No text attr"
+        }
+
+        return response_object, 404
         
-    return {"msg": "Error"}
+    return {"error": "is not json"}
+
 
 @app.route("/create", methods=["POST"])
 @token_required
@@ -92,20 +87,22 @@ def create(current_user):
     if request.is_json:
         data = request.get_json()
         if "text" in data:
-            todo_service.create_todo(current_user, data["text"])
-            return {"msg": "Todo was success created"}
+            response = todo_service.create_todo(current_user, data["text"])
+            return response
         
-        return {"msg": "No text atr"}, 404
+        response_object = {
+            "status": "fail",
+            "message": "No text attr"
+        }
 
-    return {"msg": "Error"}
+        return response_object, 404
+
+    return {"error": "is not json"}, 418
 
 @app.route("/complete/<id>", methods=["PUT"])
 @token_required
 def complete(current_user, id):
 
-    try:
-        todo_service.complete_todo(current_user, id)
-    except AttributeError as e:
-        return {"error": str(e)}, 404
+    response = todo_service.complete_todo(current_user, id)
+    return response
     
-    return {"msg": "Todo was completed"}
