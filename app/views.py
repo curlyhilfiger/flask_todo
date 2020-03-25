@@ -14,6 +14,11 @@ def login():
         data = request.get_json()
         return Auth.login_user(data)
 
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    return Auth.logout_user(request)
+
 @app.route("/users", methods=["GET"])
 @admin_token_required
 def get_users():
@@ -98,6 +103,7 @@ def create(current_user):
         return response_object, 404
 
     return {"error": "is not json"}, 418
+
 
 @app.route("/complete/<id>", methods=["PUT"])
 @token_required

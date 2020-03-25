@@ -1,4 +1,5 @@
 from app.models import User
+from app.services import blacklist_service
 
 class Auth():
 
@@ -29,6 +30,33 @@ class Auth():
                 "message": "try again"
             }
             return response_object, 500
+
+    @staticmethod
+    def logout_user(request):
+        if "Authorization" in request.headers:
+            auth_token = request.headers.get("Authorization")
+            if auth_token:
+                resp = User.decode_auth_token(auth_token)
+                if not isinstance(resp, str):
+                    return blacklist_service.save_token(auth_token)
+                else:
+                    response_object = {
+                        "status": "fail",
+                        "message": resp
+                    }
+                    return response_object, 401
+            else:
+                response_object = {
+                    "status": "fail",
+                    "message": "Provide a valid token."
+                }
+                return response_object, 403
+        else:
+            response_object = {
+                "status": "fail",
+                "message": "No Auth in headers"
+            }
+            return response_object, 403
 
     @staticmethod
     def get_logged_in_user(new_request):
